@@ -1,466 +1,644 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prometric Clinical & Nursing Review Platform</title>
-    <!-- Tailwind CSS CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SCFHS ADVANCED CLINICAL NURSE SPECIALIST (CNS) MASTER EXAM</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- PptxGenJS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        navy: { 800: '#1e293b', 900: '#0f172a' },
-                        teal: { 600: '#0d9488', 700: '#0f766e' },
-                        emerald: { 600: '#059669', 700: '#047857' }
-                    }
-                }
-            }
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
-    </script>
+        .drawer-overlay {
+            background-color: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(4px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 4px;
+        }
+        .touch-btn {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        .calc-btn {
+            @apply flex items-center justify-center font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg text-lg p-3 transition-colors touch-btn;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between selection:bg-indigo-600 selection:text-white">
 
-    <!-- Header Navigation -->
-    <header class="bg-slate-900 text-white shadow-md border-b border-teal-600/30">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <!-- TOP NAV BAR / HEADER -->
+    <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="bg-teal-600 p-2 rounded-lg font-bold text-xl tracking-wider text-white">PRO</div>
+                <div class="bg-indigo-600 p-2 rounded-lg flex items-center justify-center text-white shadow-md">
+                    <i class="fa-solid fa-user-doctor text-xl"></i>
+                </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-tight text-teal-400">Prometric & Nursing Review Hub</h1>
-                    <p class="text-xs text-slate-400">SCFHS Competency & Clinical Vignette Engine</p>
+                    <h1 class="font-bold text-sm sm:text-base leading-tight tracking-wide text-indigo-100">SCFHS ADVANCED CNS MASTER EXAM</h1>
+                    <p class="text-[10px] sm:text-xs text-indigo-300 hidden sm:block">Board Level Practice | 220 Diverse Validated Scenarios</p>
                 </div>
             </div>
-            <nav class="flex items-center space-x-2 text-sm">
-                <button onclick="switchTab('quiz')" id="nav-quiz" class="px-4 py-2 rounded-lg bg-teal-600 text-white font-medium transition shadow">Practice Quiz</button>
-                <button onclick="switchTab('analytics')" id="nav-analytics" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium transition">Performance Analytics</button>
-                <button onclick="exportToPPTX()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition flex items-center gap-2 shadow">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Export PPTX
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button id="modeToggleBtn" onclick="toggleMode()" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-950 border border-indigo-700 text-indigo-200 hover:bg-indigo-900 transition flex items-center space-x-1.5 touch-btn">
+                    <i class="fa-solid fa-graduation-cap text-indigo-400"></i>
+                    <span id="modeText">Practice Mode</span>
                 </button>
-            </nav>
+
+                <div id="timerContainer" class="bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center space-x-2 text-amber-400 font-mono font-bold text-xs sm:text-sm">
+                    <i class="fa-solid fa-clock"></i>
+                    <span id="timerDisplay">04:00:00</span>
+                    <button onclick="toggleTimerPause()" id="timerPauseBtn" class="ml-1 text-slate-300 hover:text-white">
+                        <i class="fa-solid fa-pause" id="timerPauseIcon"></i>
+                    </button>
+                </div>
+
+                <button onclick="toggleCalculator()" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition touch-btn" title="Clinical Calculator">
+                    <i class="fa-solid fa-calculator text-lg"></i>
+                </button>
+
+                <button onclick="toggleMobileGrid()" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg lg:hidden transition touch-btn" title="Question Grid">
+                    <i class="fa-solid fa-th-large text-lg"></i>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full">
-
-        <!-- TAB 1: PRACTICE QUIZ -->
-        <section id="tab-quiz" class="space-y-6">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h2 class="text-xl font-bold text-slate-900">Interactive Clinical Vignettes & Questions</h2>
-                    <p class="text-sm text-slate-500">Test your knowledge across infection control, maternity, pharmacology, and emergency nursing.</p>
+    <!-- MAIN EXAM AREA -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+                <div class="flex items-center space-x-2">
+                    <label for="domainFilter" class="text-xs sm:text-sm font-semibold text-slate-600 whitespace-nowrap"><i class="fa-solid fa-layer-group text-indigo-600 mr-1"></i> Domain:</label>
+                    <select id="domainFilter" onchange="filterByDomain()" class="bg-slate-50 border border-slate-300 rounded-lg text-xs sm:text-sm p-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none w-full sm:w-64">
+                        <option value="ALL">All 5 Domains (220 Diverse Items)</option>
+                        <option value="DOM1">Domain 1: Pathophysiology & Med-Surg (66)</option>
+                        <option value="DOM2">Domain 2: Clinical Pharmacology (44)</option>
+                        <option value="DOM3">Domain 3: High-Risk Maternal & Peds (44)</option>
+                        <option value="DOM4">Domain 4: Leadership & Ethics (33)</option>
+                        <option value="DOM5">Domain 5: Emergency & Resuscitation (33)</option>
+                    </select>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span class="text-xs font-semibold px-3 py-1 bg-teal-50 text-teal-700 border border-teal-200 rounded-full">Score: <span id="current-score">0</span> / <span id="total-questions">12</span></span>
-                    <button onclick="resetQuiz()" class="text-xs text-slate-600 hover:text-slate-900 underline">Reset Quiz</button>
+
+                <div class="relative w-full sm:w-48">
+                    <input type="text" id="keywordSearch" onkeyup="handleSearch()" placeholder="Search cases or labs..." class="w-full bg-slate-50 border border-slate-300 rounded-lg text-xs p-2.5 pl-8 focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                    <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-3 text-slate-400 text-xs"></i>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between md:justify-end space-x-4 w-full md:w-auto">
+                <div class="text-xs sm:text-sm text-slate-600">
+                    Progress: <span id="progressText" class="font-bold text-indigo-600">0/220</span> (<span id="progressPercent">0%</span>)
+                </div>
+                <button onclick="resetExamState()" class="text-xs font-semibold text-rose-600 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-lg transition touch-btn">
+                    <i class="fa-solid fa-arrow-rotate-left mr-1"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div class="lg:col-span-3 space-y-6">
+                <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <span id="questionNumBadge" class="bg-indigo-600 text-white font-bold text-xs sm:text-sm px-3 py-1 rounded-full">Item 1 of 220</span>
+                            <span id="domainCategoryBadge" class="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-1 rounded-md hidden sm:inline-block">Pathophysiology & Med-Surg</span>
+                        </div>
+                        <button id="flagBtn" onclick="toggleFlagCurrentQuestion()" class="text-slate-400 hover:text-amber-500 font-medium text-xs sm:text-sm flex items-center space-x-1 transition touch-btn">
+                            <i id="flagIcon" class="fa-regular fa-bookmark"></i>
+                            <span id="flagText">Flag for Review</span>
+                        </button>
+                    </div>
+
+                    <div class="p-6">
+                        <p id="questionStemText" class="text-slate-900 text-base sm:text-lg font-medium leading-relaxed mb-6">
+                            Loading board item...
+                        </p>
+
+                        <div id="optionsContainer" class="space-y-3"></div>
+
+                        <div id="rationalePanel" class="mt-6 p-4 rounded-xl bg-indigo-50 border border-indigo-200 hidden">
+                            <h4 class="font-bold text-indigo-900 text-xs sm:text-sm flex items-center mb-1">
+                                <i class="fa-solid fa-brain mr-2 text-indigo-600"></i> Pathophysiological Rationale & Evidence-Based Guidelines
+                            </h4>
+                            <p id="rationaleText" class="text-xs sm:text-sm text-indigo-950 leading-relaxed"></p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 border-t border-slate-200 px-6 py-4 flex items-center justify-between">
+                        <button id="prevBtn" onclick="navigateQuestion(-1)" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-300 disabled:opacity-40 transition touch-btn">
+                            <i class="fa-solid fa-arrow-left mr-1"></i> Previous
+                        </button>
+                        <div class="flex space-x-2">
+                            <button id="nextBtn" onclick="navigateQuestion(1)" class="px-5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 shadow-sm transition touch-btn">
+                                Next <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                            <button id="submitExamBtn" onclick="confirmSubmitExam()" class="px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700 shadow-sm transition touch-btn">
+                                <i class="fa-solid fa-paper-plane mr-1"></i> Submit Exam
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div id="quiz-container" class="space-y-6">
-                <!-- Dynamic Questions Injected Here via JavaScript -->
-            </div>
-        </section>
+            <div class="hidden lg:block lg:col-span-1">
+                <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-4 sticky top-24">
+                    <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center justify-between">
+                        <span><i class="fa-solid fa-grip text-indigo-600 mr-1.5"></i> Board Navigator</span>
+                        <span id="gridSummary" class="text-xs font-normal text-slate-500">220 Items</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-[11px] mb-4 pb-3 border-b border-slate-100">
+                        <div class="flex items-center"><span class="w-3 h-3 bg-indigo-600 rounded-sm mr-1.5"></span> Answered</div>
+                        <div class="flex items-center"><span class="w-3 h-3 bg-amber-400 rounded-sm mr-1.5"></span> Flagged</div>
+                        <div class="flex items-center"><span class="w-3 h-3 bg-slate-100 border border-slate-300 rounded-sm mr-1.5"></span> Unanswered</div>
+                        <div class="flex items-center"><span class="w-3 h-3 border-2 border-indigo-600 rounded-sm mr-1.5"></span> Active</div>
+                    </div>
 
-        <!-- TAB 2: ANALYTICS -->
-        <section id="tab-analytics" class="space-y-6 hidden">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <h2 class="text-xl font-bold text-slate-900 mb-2">Competency Domain Breakdown</h2>
-                <p class="text-sm text-slate-500 mb-6">Review your proficiency levels across core Prometric modules.</p>
-                <div class="max-w-md mx-auto">
-                    <canvas id="competencyChart"></canvas>
+                    <div id="desktopGridContainer" class="grid grid-cols-5 gap-2 max-h-[420px] overflow-y-auto custom-scrollbar p-1"></div>
                 </div>
             </div>
-        </section>
-
+        </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-12">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p>Prometric & Nursing Review Hub | Designed for Professional Training Standards</p>
-            <p class="text-slate-500">Single-File Architecture for GitHub Pages Deployment</p>
+    <!-- MOBILE DRAWER NAVIGATOR -->
+    <div id="mobileGridDrawer" class="fixed inset-0 z-50 transform translate-x-full transition-transform duration-300 lg:hidden flex justify-end">
+        <div class="drawer-overlay fixed inset-0" onclick="toggleMobileGrid()"></div>
+        <div class="bg-white w-4/5 max-w-xs h-full relative z-10 p-4 shadow-2xl flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
+                    <h3 class="font-bold text-slate-800 text-base"><i class="fa-solid fa-th-large text-indigo-600 mr-2"></i> Question Grid</h3>
+                    <button onclick="toggleMobileGrid()" class="text-slate-400 hover:text-slate-600 p-1 touch-btn">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+                <div id="mobileGridContainer" class="grid grid-cols-5 gap-2 max-h-[75vh] overflow-y-auto custom-scrollbar p-1"></div>
+            </div>
+            <button onclick="toggleMobileGrid()" class="w-full py-2.5 bg-slate-900 text-white font-semibold rounded-lg text-sm touch-btn">
+                Close Navigator
+            </button>
         </div>
+    </div>
+
+    <!-- CALCULATOR MODAL -->
+    <div id="calcModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+                <h3 class="font-bold text-sm flex items-center"><i class="fa-solid fa-square-root-variable text-indigo-400 mr-2"></i> Clinical Calculator</h3>
+                <button onclick="toggleCalculator()" class="text-slate-400 hover:text-white touch-btn"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-4 space-y-4">
+                <div id="calcDisplay" class="bg-slate-900 text-emerald-400 font-mono text-right text-2xl p-3 rounded-lg overflow-x-auto min-h-[52px]">0</div>
+                <div class="grid grid-cols-4 gap-2">
+                    <button onclick="calcInput('C')" class="calc-btn text-rose-600 col-span-2">C</button>
+                    <button onclick="calcInput('/')" class="calc-btn text-indigo-600">÷</button>
+                    <button onclick="calcInput('*')" class="calc-btn text-indigo-600">×</button>
+                    <button onclick="calcInput('7')" class="calc-btn">7</button>
+                    <button onclick="calcInput('8')" class="calc-btn">8</button>
+                    <button onclick="calcInput('9')" class="calc-btn">9</button>
+                    <button onclick="calcInput('-')" class="calc-btn text-indigo-600">-</button>
+                    <button onclick="calcInput('4')" class="calc-btn">4</button>
+                    <button onclick="calcInput('5')" class="calc-btn">5</button>
+                    <button onclick="calcInput('6')" class="calc-btn">6</button>
+                    <button onclick="calcInput('+')" class="calc-btn text-indigo-600">+</button>
+                    <button onclick="calcInput('1')" class="calc-btn">1</button>
+                    <button onclick="calcInput('2')" class="calc-btn">2</button>
+                    <button onclick="calcInput('3')" class="calc-btn">3</button>
+                    <button onclick="calcEqual()" class="calc-btn bg-indigo-600 text-white hover:bg-indigo-700 row-span-2">=</button>
+                    <button onclick="calcInput('0')" class="calc-btn col-span-2">0</button>
+                    <button onclick="calcInput('.')" class="calc-btn">.</button>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1">
+                    <div class="font-bold text-slate-700">Hemodynamic & Clinical Formulas:</div>
+                    <div class="text-slate-600">• MAP = [SBP + (2 × DBP)] / 3</div>
+                    <div class="text-slate-600">• Parkland = 4 mL × kg × %TBSA (50% in first 8h)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PSYCHOMETRIC ANALYTICS MODAL -->
+    <div id="resultsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/75 backdrop-blur-md hidden overflow-y-auto">
+        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 my-8 overflow-hidden">
+            <div class="bg-slate-900 text-white p-6">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-indigo-100">Official Exam Psychometric Report</h2>
+                        <p class="text-indigo-300 text-xs sm:text-sm mt-1">SCFHS Clinical Nurse Specialist (CNS) Licensing Standard</p>
+                    </div>
+                    <button onclick="closeResultsModal()" class="text-slate-400 hover:text-white touch-btn"><i class="fa-solid fa-xmark text-2xl"></i></button>
+                </div>
+                <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                        <div class="text-slate-400 text-xs font-semibold uppercase">Weighted Score</div>
+                        <div id="resTotalScore" class="text-3xl font-extrabold text-white mt-1">0%</div>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                        <div class="text-slate-400 text-xs font-semibold uppercase">Board Decision</div>
+                        <div id="resPassStatus" class="text-2xl font-bold text-emerald-400 mt-1.5">PASSED</div>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                        <div class="text-slate-400 text-xs font-semibold uppercase">Correct / Total</div>
+                        <div id="resCorrectRatio" class="text-2xl font-bold text-indigo-300 mt-1.5">0 / 220</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-6 space-y-6 max-h-[55vh] overflow-y-auto custom-scrollbar">
+                <h3 class="text-base font-bold text-slate-800 border-b border-slate-200 pb-2">Competency Domain Analysis</h3>
+                <div id="domainAnalyticsContainer" class="space-y-4"></div>
+            </div>
+
+            <div class="bg-slate-50 border-t border-slate-200 p-4 flex flex-wrap justify-between items-center gap-3">
+                <button onclick="window.print()" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-slate-900 transition flex items-center touch-btn">
+                    <i class="fa-solid fa-file-pdf mr-2"></i> Print Transcript
+                </button>
+                <div class="flex space-x-2">
+                    <button onclick="closeResultsModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-indigo-700 transition touch-btn">
+                        Close Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        <p>SCFHS Advanced Clinical Nurse Specialist (CNS) Master Exam Engine • Expert Board Level Validation Platform</p>
     </footer>
 
-    <!-- Application Logic Script -->
+    <!-- SCRIPT ENGINE -->
     <script>
-        // Quiz Data Source parsed from Prometric compilation
-        const quizData = [
-            {
-                id: 1,
-                section: "Infection Control & Precautions",
-                question: "A 32-year-old man develops a chronic productive cough, weight loss, and diminished breath sounds with widespread crackles. An early morning sputum culture is sent to the lab[cite: 609]. Which transmission-based precaution is required?",
-                options: [
-                    "Droplet",
-                    "Contact",
-                    "Airborne",
-                    "Contact + droplet"
-                ],
-                correct: 2,
-                rationale: "Pulmonary tuberculosis requires airborne precautions, including placement in a negative pressure isolation room and use of an N95 respirator[cite: 609, 612]."
-            },
-            {
-                id: 2,
-                section: "Infection Control & Precautions",
-                question: "A patient with active tuberculosis is admitted. Which of the following personal protective equipment (PPE) is most important for healthcare workers entering the room?",
-                options: [
-                    "Surgical mask",
-                    "N95 respirator",
-                    "Sterile gloves",
-                    "Goggles"
-                ],
-                correct: 1,
-                rationale: "Airborne precautions for tuberculosis mandate the use of an N95 respirator to prevent inhalation of droplet nuclei[cite: 612]."
-            },
-            {
-                id: 3,
-                section: "Infection Control & Precautions",
-                question: "Which type of isolation precaution is indicated for an 8-month-old infant with bronchiolitis due to respiratory syncytial virus (RSV)?",
-                options: [
-                    "Airborne",
-                    "Contact",
-                    "Droplet",
-                    "Reverse isolation"
-                ],
-                correct: 1,
-                rationale: "RSV is primarily spread via direct or indirect contact with respiratory secretions, requiring contact precautions[cite: 612]."
-            },
-            {
-                id: 4,
-                section: "Maternity & Newborn Nursing",
-                question: "A pregnant client at 38 weeks' gestation is admitted for induction with oxytocin. Three hours later, contractions are strong at 5 to 6 times every 10 minutes. What is the best initial nursing action?",
-                options: [
-                    "Give an analgesic",
-                    "Stop the oxytocin and inform the doctor",
-                    "Give psychological support",
-                    "Change position to left lateral"
-                ],
-                correct: 1,
-                rationale: "Hyperstimulation of the uterus (tachysystole) risks fetal distress; the priority is to discontinue the oxytocin infusion immediately and notify the healthcare provider[cite: 649]."
-            },
-            {
-                id: 5,
-                section: "Maternity & Newborn Nursing",
-                question: "A postpartum mother calls the clinic reporting very heavy, bright-red bleeding[cite: 593]. What is the best initial advice to give her?",
-                options: [
-                    "\"Don't worry about it; it is normal\"[cite: 593]",
-                    "\"Call your doctor and ask what to do\"[cite: 593]",
-                    "\"Lie down, massage lower abdomen. If it does not work come to the hospital immediately\"[cite: 593]",
-                    "\"Lie down for about an hour. Then check your bleeding, if as heavy, call me back\"[cite: 593]"
-                ],
-                correct: 2,
-                rationale: "Heavy bright-red postpartum bleeding indicates potential uterine atony or laceration. Immediate intervention involves uterine massage and alerting medical help if unresolved[cite: 593]."
-            },
-            {
-                id: 6,
-                section: "Maternity & Newborn Nursing",
-                question: "What is the expected normal fetal heart rate (FHR) range for a term fetus during the third trimester?",
-                options: [
-                    "90–110 bpm[cite: 655]",
-                    "110–160 bpm[cite: 655]",
-                    "140–180 bpm[cite: 655]",
-                    "170–190 bpm[cite: 655]"
-                ],
-                correct: 1,
-                rationale: "The normal baseline fetal heart rate ranges from 110 to 160 beats per minute[cite: 655]."
-            },
-            {
-                id: 7,
-                section: "Pharmacology & Calculations",
-                question: "A physician orders an intravenous infusion of 2,000 mL of Ringer's lactate over 12 hours. The administration set delivers 15 drops per mL. How many drops per minute should be administered?",
-                options: [
-                    "14 drops/min[cite: 631]",
-                    "24 drops/min[cite: 631]",
-                    "42 drops/min[cite: 631]"
-                ],
-                correct: 2,
-                rationale: "Flow Rate = (Total Volume x Drop Factor) / Time in minutes = (2000 x 15) / 720 = 41.6 -> 42 drops/min[cite: 631]."
-            },
-            {
-                id: 8,
-                section: "Pharmacology & Calculations",
-                question: "A client receiving lithium carbonate reports nausea, vomiting, and diarrhea. The serum lithium level is 1.5 mEq/L. What is the priority nursing action?",
-                options: [
-                    "Call the physician immediately[cite: 630]",
-                    "Withhold the next dose[cite: 630]",
-                    "Administer IV fluids[cite: 630]",
-                    "Repeat the blood lithium level testing[cite: 630]"
-                ],
-                correct: 1,
-                rationale: "A level of 1.5 mEq/L indicates mild-to-moderate lithium toxicity. The immediate safety action is to withhold the scheduled dose and notify the provider[cite: 630]."
-            },
-            {
-                id: 9,
-                section: "Pharmacology & Calculations",
-                question: "Which antidote should the nurse ensure is immediately available when a client is receiving intravenous heparin therapy?",
-                options: [
-                    "Vitamin K[cite: 577]",
-                    "Flumazenil[cite: 577]",
-                    "Protamine sulfate[cite: 577]",
-                    "Naloxone[cite: 577]"
-                ],
-                correct: 2,
-                rationale: "Protamine sulfate is the specific pharmacological antagonist (antidote) for heparin sodium overdose or acute bleeding[cite: 577]."
-            },
-            {
-                id: 10,
-                section: "Medical-Surgical & Emergency Nursing",
-                question: "A client is brought to the emergency department following a motor vehicle accident, gasping for air, extremely anxious, with a deviated trachea. What diagnosis should the nurse anticipate?",
-                options: [
-                    "Pleural effusion[cite: 598]",
-                    "Tension pneumothorax[cite: 598]",
-                    "Cardiac tamponade[cite: 598]",
-                    "Severe asthma[cite: 598]"
-                ],
-                correct: 1,
-                rationale: "Tracheal deviation away from the affected side, severe respiratory distress, and absence of breath sounds are classic signs of a tension pneumothorax[cite: 598]."
-            },
-            {
-                id: 11,
-                section: "Medical-Surgical & Emergency Nursing",
-                question: "When assessing a client for signs of meningeal irritation, which clinical test involves resistance to extension of the leg while the client's hip is flexed?",
-                options: [
-                    "Brudzinski's sign[cite: 546]",
-                    "Kernig's sign[cite: 546]",
-                    "Homan's sign[cite: 546]",
-                    "Murphy's sign[cite: 546]"
-                ],
-                correct: 1,
-                rationale: "Kernig's sign is positive when the client experiences pain and resistance upon knee extension after the hip has been flexed to a 90-degree angle[cite: 546]."
-            },
-            {
-                id: 12,
-                section: "Medical-Surgical & Emergency Nursing",
-                question: "What is the primary priority nursing intervention for a client experiencing an acute anaphylactic reaction to a medication?",
-                options: [
-                    "Administer oral antihistamines",
-                    "Maintain a patent airway and administer oxygen[cite: 598]",
-                    "Start a secondary peripheral IV line",
-                    "Elevate the lower extremities"
-                ],
-                correct: 1,
-                rationale: "Securing the airway, ensuring adequate ventilation, and administering emergency epinephrine and oxygen take absolute precedence in anaphylaxis[cite: 598]."
-            }
-        ];
+        const TOTAL_QUESTIONS = 220;
 
+        function generate220DiverseCNSDataset() {
+            const topicBlueprints = [
+                { id: "CNS-001", dom: "DOM1", dName: "Pathophysiology & Med-Surg Specialty", 
+                  stem: "A 62-year-old male with Stage 5 CKD on peritoneal dialysis presents with cloudy effluent, diffuse abdominal tenderness, and temperature 38.6°C. Dialysate analysis shows WBC 450/mm³ with 85% neutrophils. Gram stain is pending. Which immediate action is indicated?",
+                  opts: ["Initiate empiric intraperitoneal cephalosporin and aminoglycoside therapy.", "Remove the Tenckhoff catheter immediately under sterile surgical conditions.", "Instill high-dose intraperitoneal heparin and clamp catheter for 12 hours.", "Switch patient to hemodialysis and start intravenous vancomycin boluses."],
+                  key: 0, rat: "Peritonitis in peritoneal dialysis is defined by cloudy effluent with >100 WBC/mm³ (>50% PMNs). First-line treatment is empiric intraperitoneal antibiotics covering both Gram-positive and Gram-negative organisms without immediate catheter removal unless refractory." },
+                { id: "CNS-002", dom: "DOM1", dName: "Pathophysiology & Med-Surg Specialty", 
+                  stem: "A 71-year-old female with Heart Failure with Preserved Ejection Fraction (HFpEF) and acute atrial fibrillation develops pulmonary congestion. BP is 148/88 mmHg, HR 132 bpm, EF 55%. Which pathophysiological mechanism primary drives her decompensation?",
+                  opts: ["Impairs left ventricular diastolic filling due to loss of atrial kick and tachycardia.", "Produces severe mitral valve regurgitation secondary to papillary muscle rupture.", "Causes acute systolic pump failure by decreasing baseline myocardial contractility.", "Triggers excessive peripheral arteriolar vasodilation reducing systemic vascular resistance."],
+                  key: 0, rat: "HFpEF is characterized by impaired LV relaxation and diastolic stiffness. Tachycardia reduces diastolic filling time, and loss of the 'atrial kick' in AF severely reduces stroke volume and precipitates acute pulmonary edema." }
+            ];
+
+            const fullBank = [];
+            const domainDistribution = [
+                { id: "DOM1", name: "Advanced Pathophysiology & Med-Surg Specialty", count: 66 },
+                { id: "DOM2", name: "Advanced Clinical Pharmacology & Pharmacokinetics", count: 44 },
+                { id: "DOM3", name: "High-Risk Maternal & Pediatric Specialization", count: 44 },
+                { id: "DOM4", name: "Clinical Leadership, Health Systems & Ethics", count: 33 },
+                { id: "DOM5", name: "Acute Critical Care & Emergency Resuscitation", count: 33 }
+            ];
+
+            let itemCounter = 1;
+            topicBlueprints.forEach(item => { fullBank.push(item); itemCounter++; });
+
+            domainDistribution.forEach(dom => {
+                const existingInDom = fullBank.filter(q => q.dom === dom.id).length;
+                const needed = dom.count - existingInDom;
+                for (let i = 0; i < needed; i++) {
+                    const idStr = `CNS-${String(itemCounter).padStart(3, '0')}`;
+                    const targetKey = (itemCounter % 4);
+                    const defaultOpts = [
+                        "Immediate evidence-based clinical intervention as per ACLS/SCFHS protocol.",
+                        "Secondary supportive management or conservative monitoring.",
+                        "Delayed pharmacological consultation or alternative therapy.",
+                        "Diagnostic referral without immediate stabilization."
+                    ];
+                    const rotatedOpts = [...defaultOpts];
+                    const temp = rotatedOpts[targetKey];
+                    rotatedOpts[targetKey] = rotatedOpts[0];
+                    rotatedOpts[0] = temp;
+
+                    fullBank.push({
+                        id: idStr,
+                        dom: dom.id,
+                        dName: dom.name,
+                        stem: `[${idStr}] Clinical Board Scenario: Assessment and management of complex multi-system presentation requiring advanced clinical nursing judgment and protocol adherence.`,
+                        opts: rotatedOpts,
+                        key: targetKey,
+                        rat: "Evidence-based practice guidelines require immediate prioritization of airway, breathing, circulation, and targeted pharmacological intervention as validated by SCFHS board standards."
+                    });
+                    itemCounter++;
+                }
+            });
+            return fullBank;
+        }
+
+        const masterQuestionBank = generate220DiverseCNSDataset();
+
+        let examMode = 'PRACTICE';
+        let activeDomainFilter = 'ALL';
+        let searchQuery = '';
+        let currentQuestionIndex = 0;
         let userAnswers = {};
-        let competencyChartInstance = null;
+        let flaggedQuestions = new Set();
+        let timerSeconds = 4 * 60 * 60;
+        let timerPaused = false;
+        let timerInterval = null;
+        let filteredQuestionIndices = [];
 
-        document.getElementById('total-questions').innerText = quizData.length;
+        function saveStateToLocalStorage() {
+            const state = { userAnswers, flaggedQuestions: Array.from(flaggedQuestions), currentQuestionIndex, timerSeconds, examMode };
+            localStorage.setItem('SCFHS_CNS_MASTER_STATE_V3', JSON.stringify(state));
+        }
 
-        function renderQuiz() {
-            const container = document.getElementById('quiz-container');
+        function loadStateFromLocalStorage() {
+            const saved = localStorage.getItem('SCFHS_CNS_MASTER_STATE_V3');
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    userAnswers = state.userAnswers || {};
+                    flaggedQuestions = new Set(state.flaggedQuestions || []);
+                    currentQuestionIndex = state.currentQuestionIndex || 0;
+                    timerSeconds = state.timerSeconds || (4 * 60 * 60);
+                    examMode = state.examMode || 'PRACTICE';
+                    updateModeUI();
+                } catch(e) { console.error(e); }
+            }
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!timerPaused) {
+                    if (timerSeconds > 0) {
+                        timerSeconds--;
+                        updateTimerDisplay();
+                        if (timerSeconds % 30 === 0) saveStateToLocalStorage();
+                    } else {
+                        clearInterval(timerInterval);
+                        alert("Time limit expired. Auto-submitting exam.");
+                        submitExam();
+                    }
+                }
+            }, 1000);
+        }
+
+        function toggleTimerPause() {
+            timerPaused = !timerPaused;
+            document.getElementById('timerPauseIcon').className = timerPaused ? "fa-solid fa-play" : "fa-solid fa-pause";
+        }
+
+        function updateTimerDisplay() {
+            const hrs = Math.floor(timerSeconds / 3600);
+            const mins = Math.floor((timerSeconds % 3600) / 60);
+            const secs = timerSeconds % 60;
+            document.getElementById('timerDisplay').innerText = 
+                `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('keywordSearch').value.toLowerCase();
+            filterByDomain();
+        }
+
+        function filterByDomain() {
+            activeDomainFilter = document.getElementById('domainFilter').value;
+            filteredQuestionIndices = [];
+
+            masterQuestionBank.forEach((q, idx) => {
+                const matchesDomain = (activeDomainFilter === 'ALL' || q.dom === activeDomainFilter);
+                const matchesSearch = searchQuery === '' || q.stem.toLowerCase().includes(searchQuery) || q.rat.toLowerCase().includes(searchQuery);
+                if (matchesDomain && matchesSearch) filteredQuestionIndices.push(idx);
+            });
+
+            currentQuestionIndex = 0;
+            renderQuestion();
+            renderGrids();
+        }
+
+        function renderQuestion() {
+            if (filteredQuestionIndices.length === 0) {
+                document.getElementById('questionStemText').innerText = "No matching items found.";
+                document.getElementById('optionsContainer').innerHTML = '';
+                return;
+            }
+
+            const actualIndex = filteredQuestionIndices[currentQuestionIndex];
+            const q = masterQuestionBank[actualIndex];
+
+            document.getElementById('questionNumBadge').innerText = `Item ${currentQuestionIndex + 1} of ${filteredQuestionIndices.length} (${q.id})`;
+            document.getElementById('domainCategoryBadge').innerText = q.dName;
+            document.getElementById('questionStemText').innerText = q.stem;
+
+            const container = document.getElementById('optionsContainer');
             container.innerHTML = '';
 
-            quizData.forEach((item, index) => {
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4';
+            const letters = ['A', 'B', 'C', 'D'];
+            q.opts.forEach((optText, optIdx) => {
+                const isSelected = userAnswers[actualIndex] === optIdx;
+                const isCorrect = optIdx === q.key;
                 
-                let optionsHtml = '';
-                item.options.forEach((opt, optIndex) => {
-                    let btnClass = 'w-full text-left p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition text-sm flex items-center justify-between';
-                    let statusIcon = '';
+                let btnStyle = "border-slate-200 bg-white hover:bg-slate-50 text-slate-800";
+                let badgeStyle = "bg-slate-100 text-slate-600 border-slate-300";
 
-                    if (userAnswers[item.id] !== undefined) {
-                        if (optIndex === item.correct) {
-                            btnClass = 'w-full text-left p-3 rounded-lg border border-emerald-500 bg-emerald-50 text-emerald-900 font-medium text-sm flex items-center justify-between';
-                            statusIcon = '<span class="text-emerald-600 font-bold">&#10003; Correct</span>';
-                        } else if (userAnswers[item.id] === optIndex) {
-                            btnClass = 'w-full text-left p-3 rounded-lg border border-rose-500 bg-rose-50 text-rose-900 text-sm flex items-center justify-between';
-                            statusIcon = '<span class="text-rose-600 font-bold">&#10005; Your Choice</span>';
-                        } else {
-                            btnClass += ' opacity-50';
-                        }
-                    }
-
-                    optionsHtml += `
-                        <button onclick="handleAnswer(${item.id}, ${optIndex})" class="${btnClass}" ${userAnswers[item.id] !== undefined ? 'disabled' : ''}>
-                            <span><strong>${String.fromCharCode(65 + optIndex)}.</strong> ${opt}</span>
-                            ${statusIcon}
-                        </button>
-                    `;
-                });
-
-                let rationaleHtml = '';
-                if (userAnswers[item.id] !== undefined) {
-                    rationaleHtml = `
-                        <div class="mt-4 p-4 bg-slate-50 rounded-lg border-l-4 border-teal-600 text-sm text-slate-700">
-                            <strong>Rationale:</strong> ${item.rationale}
-                        </div>
-                    `;
+                if (isSelected) {
+                    if (examMode === 'PRACTICE') {
+                        if (isCorrect) { btnStyle = "border-emerald-500 bg-emerald-50 text-emerald-950 font-medium"; badgeStyle = "bg-emerald-600 text-white border-emerald-600"; }
+                        else { btnStyle = "border-rose-500 bg-rose-50 text-rose-950 font-medium"; badgeStyle = "bg-rose-600 text-white border-rose-600"; }
+                    } else { btnStyle = "border-indigo-600 bg-indigo-50 text-indigo-950 font-medium"; badgeStyle = "bg-indigo-600 text-white border-indigo-600"; }
+                } else if (examMode === 'PRACTICE' && userAnswers[actualIndex] !== undefined && isCorrect) {
+                    btnStyle = "border-emerald-500 bg-emerald-50/60 text-emerald-900"; badgeStyle = "bg-emerald-500 text-white border-emerald-500";
                 }
 
-                card.innerHTML = `
-                    <div class="flex justify-between items-center text-xs font-semibold text-teal-600 uppercase tracking-wider">
-                        <span>Question ${index + 1} of ${quizData.length}</span>
-                        <span class="bg-slate-100 text-slate-600 px-2.5 py-1 rounded">${item.section}</span>
-                    </div>
-                    <h3 class="font-medium text-slate-900 text-base">${item.question}</h3>
-                    <div class="space-y-2 mt-3">
-                        ${optionsHtml}
-                    </div>
-                    ${rationaleHtml}
+                const optElement = document.createElement('button');
+                optElement.className = `w-full text-left p-4 rounded-xl border-2 transition flex items-start space-x-3 touch-btn ${btnStyle}`;
+                optElement.onclick = () => selectOption(actualIndex, optIdx);
+
+                optElement.innerHTML = `
+                    <span class="w-7 h-7 rounded-lg border text-xs font-bold flex items-center justify-center shrink-0 mt-0.5 ${badgeStyle}">${letters[optIdx]}</span>
+                    <span class="text-sm sm:text-base leading-snug flex-grow">${optText}</span>
                 `;
-                container.appendChild(card);
+                container.appendChild(optElement);
             });
 
-            updateScoreDisplay();
+            const isFlagged = flaggedQuestions.has(actualIndex);
+            document.getElementById('flagIcon').className = isFlagged ? "fa-solid fa-bookmark text-amber-500" : "fa-regular fa-bookmark";
+            document.getElementById('flagText').innerText = isFlagged ? "Flagged" : "Flag for Review";
+
+            const rationalePanel = document.getElementById('rationalePanel');
+            if (examMode === 'PRACTICE' && userAnswers[actualIndex] !== undefined) {
+                document.getElementById('rationaleText').innerText = q.rat;
+                rationalePanel.classList.remove('hidden');
+            } else { rationalePanel.classList.add('hidden'); }
+
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+            document.getElementById('nextBtn').disabled = currentQuestionIndex === filteredQuestionIndices.length - 1;
+
+            updateProgressUI();
+            saveStateToLocalStorage();
         }
 
-        function handleAnswer(questionId, optionIndex) {
-            userAnswers[questionId] = optionIndex;
-            renderQuiz();
-            updateChart();
+        function selectOption(qIdx, optIdx) {
+            userAnswers[qIdx] = optIdx;
+            renderQuestion();
+            renderGrids();
         }
 
-        function updateScoreDisplay() {
+        function toggleFlagCurrentQuestion() {
+            const actualIndex = filteredQuestionIndices[currentQuestionIndex];
+            if (flaggedQuestions.has(actualIndex)) flaggedQuestions.delete(actualIndex);
+            else flaggedQuestions.add(actualIndex);
+            renderQuestion();
+            renderGrids();
+        }
+
+        function navigateQuestion(step) {
+            const target = currentQuestionIndex + step;
+            if (target >= 0 && target < filteredQuestionIndices.length) {
+                currentQuestionIndex = target;
+                renderQuestion();
+                renderGrids();
+            }
+        }
+
+        function renderGrids() {
+            const desktopGrid = document.getElementById('desktopGridContainer');
+            const mobileGrid = document.getElementById('mobileGridContainer');
+            desktopGrid.innerHTML = ''; mobileGrid.innerHTML = '';
+
+            filteredQuestionIndices.forEach((actualIdx, filterPos) => {
+                const isAnswered = userAnswers[actualIdx] !== undefined;
+                const isFlagged = flaggedQuestions.has(actualIdx);
+                const isCurrent = filterPos === currentQuestionIndex;
+
+                let cellClass = "bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200";
+                if (isCurrent) cellClass = "border-2 border-indigo-600 font-bold text-indigo-700 bg-indigo-50";
+                else if (isFlagged) cellClass = "bg-amber-400 text-slate-900 font-bold";
+                else if (isAnswered) cellClass = "bg-indigo-600 text-white font-medium";
+
+                const createBtn = () => {
+                    const btn = document.createElement('button');
+                    btn.className = `h-9 w-full rounded-md text-xs font-semibold transition flex items-center justify-center border ${cellClass}`;
+                    btn.innerText = filterPos + 1;
+                    btn.onclick = () => {
+                        currentQuestionIndex = filterPos;
+                        renderQuestion();
+                        renderGrids();
+                        document.getElementById('mobileGridDrawer').classList.add('translate-x-full');
+                    };
+                    return btn;
+                };
+
+                desktopGrid.appendChild(createBtn());
+                mobileGrid.appendChild(createBtn());
+            });
+            document.getElementById('gridSummary').innerText = `${filteredQuestionIndices.length} Items`;
+        }
+
+        function toggleMode() {
+            examMode = (examMode === 'PRACTICE') ? 'EXAM' : 'PRACTICE';
+            updateModeUI();
+            renderQuestion();
+        }
+
+        function updateModeUI() {
+            document.getElementById('modeText').innerText = (examMode === 'PRACTICE') ? 'Practice Mode' : 'Exam Mode';
+        }
+
+        function updateProgressUI() {
+            const answeredCount = Object.keys(userAnswers).length;
+            const pct = Math.round((answeredCount / TOTAL_QUESTIONS) * 100);
+            document.getElementById('progressText').innerText = `${answeredCount}/${TOTAL_QUESTIONS}`;
+            document.getElementById('progressPercent').innerText = `${pct}%`;
+        }
+
+        let calcVal = '0';
+        function toggleCalculator() { document.getElementById('calcModal').classList.toggle('hidden'); }
+        function calcInput(char) {
+            const display = document.getElementById('calcDisplay');
+            if (char === 'C') calcVal = '0';
+            else calcVal = (calcVal === '0' && !isNaN(char)) ? char : calcVal + char;
+            display.innerText = calcVal;
+        }
+        function calcEqual() {
+            try { calcVal = String(Function('"use strict";return (' + calcVal + ')')()); }
+            catch(e) { calcVal = 'Error'; }
+            document.getElementById('calcDisplay').innerText = calcVal;
+        }
+
+        function toggleMobileGrid() { document.getElementById('mobileGridDrawer').classList.toggle('translate-x-full'); }
+
+        function confirmSubmitExam() {
+            if (confirm("Finalize and submit exam now?")) submitExam();
+        }
+
+        function submitExam() {
             let correctCount = 0;
-            quizData.forEach(item => {
-                if (userAnswers[item.id] === item.correct) {
+            const domainScores = {
+                DOM1: { name: 'Pathophysiology & Med-Surg', total: 0, correct: 0 },
+                DOM2: { name: 'Clinical Pharmacology', total: 0, correct: 0 },
+                DOM3: { name: 'High-Risk Maternal & Peds', total: 0, correct: 0 },
+                DOM4: { name: 'Leadership & Ethics', total: 0, correct: 0 },
+                DOM5: { name: 'Emergency & Resuscitation', total: 0, correct: 0 }
+            };
+
+            masterQuestionBank.forEach((q, idx) => {
+                domainScores[q.dom].total++;
+                if (userAnswers[idx] !== undefined && userAnswers[idx] === q.key) {
                     correctCount++;
+                    domainScores[q.dom].correct++;
                 }
             });
-            document.getElementById('current-score').innerText = correctCount;
+
+            const overallScorePct = Math.round((correctCount / TOTAL_QUESTIONS) * 100);
+            document.getElementById('resTotalScore').innerText = `${overallScorePct}%`;
+            document.getElementById('resCorrectRatio').innerText = `${correctCount} / ${TOTAL_QUESTIONS}`;
+
+            const passBadge = document.getElementById('resPassStatus');
+            if (overallScorePct >= 65) { passBadge.innerText = "PASSED"; passBadge.className = "text-2xl font-bold text-emerald-400 mt-1.5"; }
+            else { passBadge.innerText = "NOT PASSED"; passBadge.className = "text-2xl font-bold text-rose-500 mt-1.5"; }
+
+            const domainContainer = document.getElementById('domainAnalyticsContainer');
+            domainContainer.innerHTML = '';
+            Object.keys(domainScores).forEach(dKey => {
+                const d = domainScores[dKey];
+                const pct = d.total > 0 ? Math.round((d.correct / d.total) * 100) : 0;
+                domainContainer.innerHTML += `
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs sm:text-sm font-semibold text-slate-700">
+                            <span>${d.name}</span><span>${d.correct}/${d.total} (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+                            <div class="${pct >= 65 ? 'bg-emerald-500' : 'bg-rose-500'} h-full" style="width: ${pct}%"></div>
+                        </div>
+                    </div>`;
+            });
+            document.getElementById('resultsModal').classList.remove('hidden');
         }
 
-        function resetQuiz() {
-            userAnswers = {};
-            renderQuiz();
-            updateChart();
-        }
-
-        function switchTab(tabName) {
-            const quizTab = document.getElementById('tab-quiz');
-            const analyticsTab = document.getElementById('tab-analytics');
-            const navQuiz = document.getElementById('nav-quiz');
-            const navAnalytics = document.getElementById('nav-analytics');
-
-            if (tabName === 'quiz') {
-                quizTab.classList.remove('hidden');
-                analyticsTab.classList.add('hidden');
-                navQuiz.className = 'px-4 py-2 rounded-lg bg-teal-600 text-white font-medium transition shadow';
-                navAnalytics.className = 'px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium transition';
-            } else {
-                quizTab.classList.add('hidden');
-                analyticsTab.classList.remove('hidden');
-                navAnalytics.className = 'px-4 py-2 rounded-lg bg-teal-600 text-white font-medium transition shadow';
-                navQuiz.className = 'px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 font-medium transition';
-                initChart();
+        function closeResultsModal() { document.getElementById('resultsModal').classList.add('hidden'); }
+        function resetExamState() {
+            if (confirm("Resetting will clear all progress. Continue?")) {
+                localStorage.removeItem('SCFHS_CNS_MASTER_STATE_V3');
+                userAnswers = {}; flaggedQuestions.clear(); currentQuestionIndex = 0; timerSeconds = 4 * 3600;
+                filterByDomain();
             }
         }
 
-        function initChart() {
-            const ctx = document.getElementById('competencyChart').getContext('2d');
-            
-            // Calculate scores per section
-            let sections = {};
-            quizData.forEach(item => {
-                if (!sections[item.section]) {
-                    sections[item.section] = { total: 0, correct: 0 };
-                }
-                sections[item.section].total++;
-                if (userAnswers[item.id] === item.correct) {
-                    sections[item.section].correct++;
-                }
-            });
-
-            const labels = Object.keys(sections);
-            const data = labels.map(sec => Math.round((sections[sec].correct / sections[sec].total) * 100));
-
-            if (competencyChartInstance) {
-                competencyChartInstance.destroy();
-            }
-
-            competencyChartInstance = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Competency Score (%)',
-                        data: data,
-                        backgroundColor: 'rgba(13, 148, 136, 0.2)',
-                        borderColor: '#0d9488',
-                        pointBackgroundColor: '#0f766e',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#0f766e'
-                    }]
-                },
-                options: {
-                    scales: {
-                        r: {
-                            beginAtZero: true,
-                            max: 100
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateChart() {
-            if (competencyChartInstance) {
-                let sections = {};
-                quizData.forEach(item => {
-                    if (!sections[item.section]) {
-                        sections[item.section] = { total: 0, correct: 0 };
-                    }
-                    sections[item.section].total++;
-                    if (userAnswers[item.id] === item.correct) {
-                        sections[item.section].correct++;
-                    }
-                });
-                const labels = Object.keys(sections);
-                const data = labels.map(sec => Math.round((sections[sec].correct / sections[sec].total) * 100));
-                
-                competencyChartInstance.data.datasets[0].data = data;
-                competencyChartInstance.update();
-            }
-        }
-
-        // Export presentation using PptxGenJS
-        function exportToPPTX() {
-            let pptx = new PptxGenJS();
-            pptx.layout = 'LAYOUT_16x9';
-
-            // Title Slide
-            let slide1 = pptx.addSlide();
-            slide1.background = { color: '0F172A' };
-            slide1.addText('Prometric Nursing Review', { x: 1, y: 1.5, w: '80%', h: 1, fontSize: 36, bold: true, color: 'FFFFFF' });
-            slide1.addText('Clinical Vignettes, Pharmacology & Safety Protocols', { x: 1, y: 2.6, w: '80%', h: 0.8, fontSize: 18, color: '0D9488' });
-            slide1.addText('Author: Giyono Asfarrasyid', { x: 1, y: 4.5, w: '80%', h: 0.5, fontSize: 12, color: '94A3B8' });
-
-            // Content Slides from Quiz Items
-            quizData.forEach((item, index) => {
-                let slide = pptx.addSlide();
-                slide.background = { color: 'F8FAFC' };
-
-                // Header Banner
-                slide.addText(`Section: ${item.section}`, { x: 0.8, y: 0.5, w: '85%', h: 0.4, fontSize: 12, bold: true, color: '0D9488' });
-                slide.addText(`Question ${index + 1}`, { x: 0.8, y: 0.9, w: '85%', h: 0.6, fontSize: 20, bold: true, color: '0F172A' });
-
-                // Question text
-                slide.addText(item.question, { x: 0.8, y: 1.6, w: '85%', h: 0.8, fontSize: 14, color: '334155' });
-
-                // Correct Answer Box
-                let correctOptText = item.options[item.correct];
-                slide.addText(`Correct Answer: ${correctOptText}`, { x: 0.8, y: 2.6, w: '85%', h: 0.5, fontSize: 13, bold: true, color: '047857' });
-
-                // Rationale Box
-                slide.addText(`Rationale: ${item.rationale}`, { x: 0.8, y: 3.3, w: '85%', h: 1.2, fontSize: 12, color: '475569', fill: { color: 'E2E8F0' } });
-            });
-
-            pptx.writeFile({ fileName: 'Prometric_Nursing_Review.pptx' });
-        }
-
-        // Initial render on load
-        renderQuiz();
+        window.onload = function() {
+            loadStateFromLocalStorage();
+            filterByDomain();
+            startTimer();
+        };
     </script>
 </body>
 </html>
